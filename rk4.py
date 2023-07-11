@@ -9,11 +9,11 @@ def rk4(initial_x: np.ndarray, initial_t: float, f: Callable, step: float, num: 
     :param initial_t: Initial t value
     :param f: Function such that dx/dt = f(t, x)
     :param step: Size of fixed time step
-    :param num: Number of time steps
+    :param num: Number of time steps (not including initial value)
     :return: Tuple of vectors; time and position of the solution
     """
-    t = np.arange(0, num) * step + initial_t
-    x = np.zeros((len(initial_x), num))
+    t = np.arange(0, num + 1) * step + initial_t
+    x = np.zeros((len(initial_x), num + 1))
     x[:, 0] = initial_x
     for i, time in enumerate(t[:-1]):
         k1 = f(time, x[:, i])

@@ -1,65 +1,98 @@
 import numpy as np
 from matplotlib import pyplot as plt
-from scipy.integrate import solve_ivp
-
-# Define the perfect model of the Lorentz63 attractor
-sigma = 10
-rho = 28
-beta = 8 / 3
+from rk4 import rk4
 
 
 def perfect_model(t, x):
-    return [sigma * (x[1] - x[0]), x[0] * (rho - x[2]) - x[1], x[0] * x[1] - beta * x[2]]
+    """
+    Returns dx/dt for the Lorentz63 attractor
+    :param t: time
+    :param x: position
+    :return: dx/dt is expressed as a numpy vector
+    """
+    # Define the parameters of the Lorentz63 attractor
+    sigma = 10
+    rho = 28
+    beta = 8 / 3
+    return np.array([sigma * (x[1] - x[0]), x[0] * (rho - x[2]) - x[1], x[0] * x[1] - beta * x[2]])
 
 
-def generate_observation(time_step, final_time, std, integration_time_step, x0):
-    length = int(final_time / time_step) + 1
+# Introduce different time_step and integration step size????
+def generate_observation(initial_x, initial_t, final_t, step, std):
+    """
+    Solves the Lorentz63 ODE and adds noise (Gaussian error) to the solution
+    :param initial_x: initial position
+    :param initial_t: initial time
+    :param final_t: final time
+    :param step: Fixed time step for integration
+    :param std: standard deviation of the Gaussian error
+    :return:
+    """
+    num = int((final_t - initial_t) / step)
 
-    result = solve_ivp(perfect_model, [0, final_time], x0, min_step=integration_time_step,
-                       max_step=integration_time_step)
+    t, x = rk4(initial_x, initial_t, perfect_model, step, num)
 
     # standard deviation of the Gaussian error added
-    s = np.array([result.y[i][::10] for i in range(3)]) + np.random.normal(0, std, (3, length))
+    s = x + np.random.normal(0, std, (len(initial_x), num + 1))
 
-    return s
-
-
-final_time = 100
-std = 0
-s = generate_observation(0.1, final_time, std, 0.01, [3, 8, 5])
+    return t, s
 
 
-# ax = plt.figure().add_subplot(projection='3d')
-# ax.plot(s[0], s[1], s[2], linewidth=0.2)
-# plt.show()
+def predict_imperfect(initial_x, initial_t, c, time_step, integration_time_step):
+    """
+    Solves the ODE dx/dt = f(t,x) with f given by the function derivative below
+    :param initial_x: Initial position
+    :param initial_t: Initial time
+    :param c: Controls the inaccuracy of the model
+    :param time_step: Fixed time step
+    :param integration_time_step: Time step used for the Runge-Kutta integration
+    :return: A numpy vector of position at time = initial_t + time_step
+    """
 
-def F(x, c, time_step, integration_time_step):
-    # x is modified in the imperfect function f
-    # We replace x with c * np.sin(x/c) in the differential equations
     def derivative(t, x):
-        return perfect_model(t, c * np.sin(x/c))
+        # We replace x with c * np.sin(x/c) in the differential equations
+        return perfect_model(t, c * np.sin(x / c))
 
-    result = solve_ivp(derivative, [0, time_step], x, min_step=integration_time_step, max_step=integration_time_step)
-    # PROBLEM!!!
-    print(result.t)
-    print(result.y[0])
-    return [result.y[0][-1], result.y[1][-1], result.y[2][-1]]
+    num = int(time_step / integration_time_step)
+    t, x = rk4(initial_x, initial_t, derivative, integration_time_step, num)
+
+    return x[:, -1]
 
 
-delta = np.zeros((3, len(s[0]) - 1))
-Fs = np.zeros((3, len(s[0]) - 1))
+initial_x = np.array([3, 8, 5])
+initial_t = 0
+final_t = 10
 c = 100
-for i in range(len(s[0]) - 1):
-    Fs[:, i] = F(s[:, i], c, 0.1, 0.01)
-    delta[:, i] = s[:, i + 1] - Fs[:, i]
-print('delta')
+time_step = 0.01
+integration_time_step = 0.01
+std = 0
+
+def difference_predict(initial_x, initial_t, final_t, c, time_step, integration_time_step, std):
+    num = int((final_t - initial_t)/ time_step)
+    t, s = generate_observation(initial_x, initial_t, final_t, time_step, std)
+
+    # Plot the observations 3D
+    ax = plt.figure().add_subplot(projection='3d')
+    ax.plot(s[0, :], s[1, :], s[2, :], linewidth=0.2)
+    plt.show()
+
+    difference = np.zeros((len(initial_x), num + 1))
+    predictions = np.zeros((len(initial_x), num + 1))
+    predictions[:,0] = initial_x
+    for i in range(len(t[:-1])):
+        predictions[:, i + 1] = predict_imperfect(s[:,i], t[i], c, time_step, integration_time_step)
+        difference[:, i + 1] = predictions[:, i + 1] - s[:, i+1]
+    return difference
+
+
+delta = difference_predict(initial_x, initial_t, final_t, c, time_step, integration_time_step, std)
+
+print(delta.shape)
+print(delta)
 plt.scatter(delta[0, :], delta[1, :])
 plt.show()
 plt.scatter(delta[0, :], delta[2, :])
 plt.show()
 ax = plt.figure().add_subplot(projection='3d')
-ax.plot(Fs[0], Fs[1], Fs[2], linewidth=0.2)
+ax.plot(delta[0,:], delta[1,:], delta[2,:], linewidth=0.2)
 plt.show()
-
-from rk4 import rk4
-
