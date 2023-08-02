@@ -2,7 +2,6 @@ import numpy as np
 from matplotlib import pyplot as plt
 from rk4 import rk4
 
-
 def perfect_model(t, x):
     """
     Returns dx/dt for the Lorentz63 attractor
@@ -18,7 +17,7 @@ def perfect_model(t, x):
 
 
 # Introduce different time_step and integration step size????
-def generate_observation(initial_x, initial_t, final_t, step, std):
+def generate_observation(initial_x, initial_t, final_t, step, integration_step, std):
     """
     Solves the Lorentz63 ODE and adds noise (Gaussian error) to the solution
     :param initial_x: initial position
@@ -28,12 +27,15 @@ def generate_observation(initial_x, initial_t, final_t, step, std):
     :param std: standard deviation of the Gaussian error
     :return:
     """
-    num = int((final_t - initial_t) / step)
 
-    t, x = rk4(initial_x, initial_t, perfect_model, step, num)
+    num_integration = int((final_t - initial_t) / integration_step)
+    t_full, x_full = rk4(initial_x, initial_t, perfect_model, integration_step, num_integration)
+
+    t, x = t_full[0::int(step/integration_step)], x_full[0::int(step/integration_step)]
 
     # standard deviation of the Gaussian error added
-    s = x + np.random.normal(0, std, (len(initial_x), num + 1))
+    num = int((final_t - initial_t) / step)
+    s = x + np.random.normal(0, std, (num + 1, len(initial_x)))
 
     return t, s
 
@@ -56,43 +58,58 @@ def predict_imperfect(initial_x, initial_t, c, time_step, integration_time_step)
     num = int(time_step / integration_time_step)
     t, x = rk4(initial_x, initial_t, derivative, integration_time_step, num)
 
-    return x[:, -1]
+    return x[-1, :]
 
 
-initial_x = np.array([3, 8, 5])
-initial_t = 0
-final_t = 10
-c = 100
-time_step = 0.01
-integration_time_step = 0.01
-std = 0
+def predict(initial_x, initial_t, final_t, c, time_step, integration_time_step, std):
+    num = int((final_t - initial_t) / time_step)
+    t, s = generate_observation(initial_x, initial_t, final_t, time_step, integration_time_step, std)
 
-def difference_predict(initial_x, initial_t, final_t, c, time_step, integration_time_step, std):
-    num = int((final_t - initial_t)/ time_step)
-    t, s = generate_observation(initial_x, initial_t, final_t, time_step, std)
+    # # Plot the observations 3D
+    # ax = plt.figure().add_subplot(projection='3d')
+    # ax.plot(s[:, 0], s[:, 1], s[:, 2], linewidth=0.2)
+    # plt.show()
 
-    # Plot the observations 3D
-    ax = plt.figure().add_subplot(projection='3d')
-    ax.plot(s[0, :], s[1, :], s[2, :], linewidth=0.2)
-    plt.show()
-
-    difference = np.zeros((len(initial_x), num + 1))
-    predictions = np.zeros((len(initial_x), num + 1))
-    predictions[:,0] = initial_x
+    predictions = np.zeros((num + 1, len(initial_x)))
+    predictions[0, :] = initial_x
     for i in range(len(t[:-1])):
-        predictions[:, i + 1] = predict_imperfect(s[:,i], t[i], c, time_step, integration_time_step)
-        difference[:, i + 1] = predictions[:, i + 1] - s[:, i+1]
-    return difference
+        predictions[i + 1, :] = predict_imperfect(s[i, :], t[i], c, time_step, integration_time_step)
+    return t, s, predictions
 
 
-delta = difference_predict(initial_x, initial_t, final_t, c, time_step, integration_time_step, std)
+def generate_data(number_of_samples, time_span, c, time_step, integration_time_step, std):
+    all_s = np.zeros((number_of_samples, int(time_span / time_step) + 1, 3))
+    all_predictions = np.zeros((number_of_samples, int(time_span / time_step) + 1, 3))
+    for i in range(number_of_samples):
+        # Randomly generate initial value for x
+        x0 = 10 * np.random.rand(3) + 2
+        t, all_s[i], all_predictions[i] = predict(x0, 0, time_span, c, time_step, integration_time_step, std)
+        print(i)
+    return t, all_s, all_predictions
 
-print(delta.shape)
-print(delta)
-plt.scatter(delta[0, :], delta[1, :])
-plt.show()
-plt.scatter(delta[0, :], delta[2, :])
-plt.show()
-ax = plt.figure().add_subplot(projection='3d')
-ax.plot(delta[0,:], delta[1,:], delta[2,:], linewidth=0.2)
-plt.show()
+
+if __name__ == "__main__":
+    initial_x = np.array([3, 8, 5])
+    initial_t = 0
+    final_t = 100
+    c = 100
+    time_step = 0.01
+    integration_time_step = 0.01
+    std = 0
+
+    t, s, prediction = predict(initial_x, initial_t, final_t, c, time_step, integration_time_step, std)
+    delta = prediction - s
+
+    print(delta.shape)
+    print(delta)
+    plt.scatter(delta[:, 0], delta[:, 1], s=5)
+    plt.ylabel('delta_y')
+    plt.xlabel('delta_x')
+    plt.show()
+    plt.scatter(delta[:, 0], delta[:, 2], s=5)
+    plt.ylabel('delta_z')
+    plt.xlabel('delta_x')
+    plt.show()
+    ax = plt.figure().add_subplot(projection='3d')
+    ax.plot(delta[:, 0], delta[:, 1], delta[:, 2], linewidth=0.2)
+    plt.show()
