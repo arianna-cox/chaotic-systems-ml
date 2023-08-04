@@ -29,16 +29,27 @@ n = 10000
 # Time span of each time series
 time_span = 5
 # The value of c used in the imperfect model
-c = 200
+c = 500
 # The time step of the time series
 time_step = 0.1
 # The time step used during the rk4 integration method
 integration_time_step = 0.01
+# The number of timesteps ahead the imperfect model predicts
+number_timesteps_predict = 5
 # The standard deviation of the random error added to the observations
 std = 0
 
-t, observations, predictions = generate_data(n, time_span, c, time_step, integration_time_step, std)
-name = f"{n}_{time_span}_{c}_{str(time_step).replace('.', '')}_{str(integration_time_step).replace('.', '')}_{std}"
-np.save(f"data_no_std/test_observations_{name}", observations)
-np.save(f"data_no_std/test_predictions_{name}", predictions)
-np.save(f"data_no_std/test_t_{name}", t)
+t, observations, predictions = generate_data(n, time_span, c, time_step, integration_time_step, number_timesteps_predict, std)
+
+# Scale the data
+maximum_allowed = 100
+if np.max(observations) > maximum_allowed or np.max(predictions) > maximum_allowed:
+    print(f'warning, the values exceed {maximum_allowed}')
+    print(np.max(observations))
+    print(np.max(predictions))
+observations_scaled = observations/maximum_allowed
+predictions_scaled = predictions/maximum_allowed
+
+name = f"{n}_{time_span}_{c}_{str(time_step).replace('.', '')}_{str(integration_time_step).replace('.', '')}_{number_timesteps_predict}_{std}"
+np.save(f"scaled_data/test_observations_{name}", observations_scaled)
+np.save(f"scaled_data/test_predictions_{name}", predictions_scaled)

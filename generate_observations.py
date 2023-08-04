@@ -16,7 +16,6 @@ def perfect_model(t, x):
     return np.array([sigma * (x[1] - x[0]), x[0] * (rho - x[2]) - x[1], x[0] * x[1] - beta * x[2]])
 
 
-# Introduce different time_step and integration step size????
 def generate_observation(initial_x, initial_t, final_t, step, integration_step, std):
     """
     Solves the Lorentz63 ODE and adds noise (Gaussian error) to the solution
@@ -25,7 +24,7 @@ def generate_observation(initial_x, initial_t, final_t, step, integration_step, 
     :param final_t: final time
     :param step: Fixed time step for integration
     :param std: standard deviation of the Gaussian error
-    :return:
+    :return: numpy arrays of time and observations
     """
 
     num_integration = int((final_t - initial_t) / integration_step)
@@ -61,7 +60,7 @@ def predict_imperfect(initial_x, initial_t, c, time_step, integration_time_step)
     return x[-1, :]
 
 
-def predict(initial_x, initial_t, final_t, c, time_step, integration_time_step, std):
+def predict(initial_x, initial_t, final_t, c, time_step, integration_time_step, number_timesteps_predict, std):
     num = int((final_t - initial_t) / time_step)
     t, s = generate_observation(initial_x, initial_t, final_t, time_step, integration_time_step, std)
 
@@ -71,19 +70,19 @@ def predict(initial_x, initial_t, final_t, c, time_step, integration_time_step, 
     # plt.show()
 
     predictions = np.zeros((num + 1, len(initial_x)))
-    predictions[0, :] = initial_x
-    for i in range(len(t[:-1])):
-        predictions[i + 1, :] = predict_imperfect(s[i, :], t[i], c, time_step, integration_time_step)
+    predictions[:number_timesteps_predict, :] = s[:number_timesteps_predict,:]
+    for i in range(len(t[:-number_timesteps_predict])):
+        predictions[i + number_timesteps_predict, :] = predict_imperfect(s[i, :], t[i], c, time_step * number_timesteps_predict, integration_time_step)
     return t, s, predictions
 
 
-def generate_data(number_of_samples, time_span, c, time_step, integration_time_step, std):
+def generate_data(number_of_samples, time_span, c, time_step, integration_time_step, number_timesteps_predict, std):
     all_s = np.zeros((number_of_samples, int(time_span / time_step) + 1, 3))
     all_predictions = np.zeros((number_of_samples, int(time_span / time_step) + 1, 3))
     for i in range(number_of_samples):
         # Randomly generate initial value for x
         x0 = 10 * np.random.rand(3) + 2
-        t, all_s[i], all_predictions[i] = predict(x0, 0, time_span, c, time_step, integration_time_step, std)
+        t, all_s[i], all_predictions[i] = predict(x0, 0, time_span, c, time_step, integration_time_step, number_timesteps_predict, std)
         print(i)
     return t, all_s, all_predictions
 
