@@ -86,6 +86,7 @@ def generate_data(number_of_samples, time_span, c, time_step, integration_time_s
         print(i)
     return t, all_s, all_predictions
 
+
 if __name__ == "__main__":
     initial_x = np.array([3, 8, 5])
     initial_t = 0

@@ -15,8 +15,9 @@ time_step = 0.1
 integration_time_step = 0.01
 number_timesteps_predict = 2
 std = 0.01
+c_array = [15, 20, 30]
 
-for c in [10]:
+for c in c_array:
 
     # Load the observations
     observations, predictions = load_data(n, time_span, time_step, integration_time_step, number_timesteps_predict, std, c = c)

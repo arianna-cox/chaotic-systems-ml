@@ -34,7 +34,7 @@ for c in [10,50,100,200,500]:
 
     # Create callbacks
     save_name = f"c{c}_{n}_{time_span}_{str(time_step).replace('.', '')}_{str(integration_time_step).replace('.', '')}_{number_timesteps_predict}_{str(std).replace('.', '')}"
-    save_filepath = f'saved_models/timesteps_{number_timesteps_predict}/physical_model_{save_name}.keras'
+    save_filepath = f'saved_models/timesteps_{number_timesteps_predict}/physical_error_{save_name}.keras'
     # model = keras.models.load_model(save_filepath)
     patience = 15
     callbacks = create_callbacks(model, patience, save_filepath)

@@ -121,7 +121,7 @@ n = 10000
 # Time span of each time series
 time_span = 5
 # The value of c used in the imperfect model
-c_array = [1, 2, 5, 10]
+c_array = [0.001, 0.01, 0.1, 0.5]
 # The time step of the time series
 time_step = 0.1
 # The time step used during the rk4 integration method
