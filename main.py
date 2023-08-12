@@ -2,7 +2,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from scipy.integrate import solve_ivp
 from rk4 import rk4
-from generate_observations import generate_data
+from generate_observations_multiple_c import generate_and_predict_one
 
 sigma = 10
 rho = 28
@@ -39,7 +39,7 @@ number_timesteps_predict = 5
 # The standard deviation of the random error added to the observations
 std = 0
 
-t, observations, predictions = generate_data(n, time_span, c, time_step, integration_time_step, number_timesteps_predict, std)
+dictionary = generate_and_predict_one(n, time_span, c, time_step, integration_time_step, number_timesteps_predict, std)
 
 # Scale the data
 maximum_allowed = 100
