@@ -1,17 +1,17 @@
 import numpy as np
 
 # Load the observations
-def load_data(n, time_span, time_step, integration_time_step, number_timesteps_predict, std, c = None):
-    load_name = f"{n}_{time_span}_{str(time_step).replace('.', '')}_{str(integration_time_step).replace('.', '')}_{number_timesteps_predict}_{str(std).replace('.', '')}"
+def load_data(n, time_span, time_step, integration_time_step, number_timesteps_predict, std, c = None, system = 'Lorentz', x_transformation_type = 0):
+    load_name = f"{system}_{n}_{time_span}_{str(time_step).replace('.', '')}_{str(integration_time_step).replace('.', '')}_{number_timesteps_predict}_{str(std).replace('.', '')}"
     dictionary = np.load(f"data_dictionaries/data_{load_name}.npy", allow_pickle=True).item()
     observations = dictionary["observations"]
     if c is not None:
-        predictions = dictionary[c]
+        predictions = dictionary[f'x_transformation_{x_transformation_type}'][c]
         return observations, predictions
     return observations
 
 
-def split_training_data(observations, number_timesteps_predict, predictions = None, predict_error = False, frac = 0.9):
+def split_training_data(observations, number_timesteps_predict, predictions = None, predict_error = False, random_predictions = False, frac = 0.9):
     num_samples = observations.shape[0]
     cut_off = int(frac*num_samples)
     train_x = observations[:cut_off,:-number_timesteps_predict, :]
@@ -28,6 +28,13 @@ def split_training_data(observations, number_timesteps_predict, predictions = No
         if predict_error == True:
             train_answer -= train_prediction
             test_answer -= test_prediction
+
+        if random_predictions == True:
+            train_pred_random = np.random.rand(*train_prediction.shape)
+            test_pred_random = np.random.rand(*test_prediction.shape)
+            train_X_random = {"input_ob": train_x, "input_pred": train_pred_random}
+            test_X_random = {"input_ob": test_x, "input_pred": test_pred_random}
+            return train_X_random, test_X_random, train_X, test_X, train_answer, test_answer
 
         return train_X, test_X, train_answer, test_answer
     

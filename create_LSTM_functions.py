@@ -14,9 +14,9 @@ def create_model(type_of_model = 'MLonly', return_sequences = False):
         observation_LSTM = layers.LSTM(64, input_shape=(None, 3), return_sequences=return_sequences)(observation_input)
 
         prediction_input = layers.Input(shape=(3), name = 'input_pred')
-        prediction_activation = layers.Activation('linear')(prediction_input)
+        # prediction_activation = layers.Activation('linear')(prediction_input)
 
-        merge_layers = layers.Concatenate(axis=-1)([observation_LSTM, prediction_activation])
+        merge_layers = layers.Concatenate(axis=-1)([observation_LSTM, prediction_input])
         merge_dense = layers.Dense(16)(merge_layers)
         output = layers.Dense(3)(merge_dense)
 
