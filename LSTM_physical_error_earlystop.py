@@ -15,7 +15,7 @@ n = 10000
 time_span = 5
 time_step = 0.1
 integration_time_step = 0.01
-number_timesteps_predict = 5
+number_timesteps_predict = 10
 std = 0.01
 c_array = [30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140 ,150, 175, 200, 225, 250, 300, 400, 500, 600, 700, 800, 900, 1000]
 

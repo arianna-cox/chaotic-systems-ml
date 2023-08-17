@@ -169,7 +169,7 @@ time_step = 0.1
 # The time step used during the rk4 integration method
 integration_time_step = 0.01
 # The number of timesteps ahead the imperfect model predicts
-number_timesteps_predict = 5
+number_timesteps_predict = 10
 # The standard deviation of the random error added to the observations
 std = 0.01
 
