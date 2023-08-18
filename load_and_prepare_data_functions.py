@@ -10,6 +10,26 @@ def load_data(n, time_span, time_step, integration_time_step, number_timesteps_p
         return observations, predictions
     return observations
 
+def load_and_subsample_series(number_of_data_points, system, length_of_subsequence, number_timesteps_predict = 1, x_transformation_type = 0, c = None):
+    load_name = f"data_dictionaries/data_{system}_{number_of_data_points}.npy"
+    dictionary = np.load(load_name, allow_pickle=True).item()
+    s = dictionary["observations"]
+
+    length_of_timeseries, x_shape = s.shape
+    number_of_samples = length_of_timeseries - length_of_subsequence + 1
+    observations_subsampled = np.zeros((number_of_samples, length_of_subsequence, x_shape))
+    for i in range(number_of_samples):
+        observations_subsampled[i,:,:] = s[i:i+length_of_subsequence, :]
+            
+    if c is not None:
+        predictions = dictionary[f'timesteps_{number_timesteps_predict}'][f'x_transformation_{x_transformation_type}'][c]
+        predictions_subsampled = np.zeros((number_of_samples, x_shape))
+        for i in range(number_of_samples):
+            # The prediction is made from entry number (i+length_of_subsequence-1)-number_timesteps_predict) to predict observation (i+length_of_subsequence-1)
+            predictions_subsampled[i,:] = predictions[(i+length_of_subsequence-1)-number_timesteps_predict, :]
+        return observations_subsampled, predictions_subsampled
+    return observations_subsampled
+
 
 def split_training_data(observations, number_timesteps_predict, predictions = None, predict_error = False, random_predictions = False, frac = 0.9):
     num_samples = observations.shape[0]
