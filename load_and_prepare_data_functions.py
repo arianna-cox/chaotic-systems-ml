@@ -10,8 +10,11 @@ def load_data(n, time_span, time_step, integration_time_step, number_timesteps_p
         return observations, predictions
     return observations
 
-def load_and_subsample_series(number_of_data_points, system, length_of_subsequence, number_timesteps_predict = 1, x_transformation_type = 0, c = None):
-    load_name = f"data_dictionaries/data_{system}_{number_of_data_points}.npy"
+def load_and_subsample_series(number_of_data_points, system, length_of_subsequence, number_timesteps_predict = 1, x_transformation_type = 0, c = None, filename = None):
+    if filename == None:
+        load_name = f"data_dictionaries/data_{system}_{number_of_data_points}.npy"
+    else:
+        load_name = filename
     dictionary = np.load(load_name, allow_pickle=True).item()
     s = dictionary["observations"]
 

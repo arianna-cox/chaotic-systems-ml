@@ -186,7 +186,7 @@ dictionary = generate_series_and_predict(time_span,
                                       std,
                                       list_timesteps_predict = number_timesteps_predict,
                                       c_array = c_array,
-                                      load_filename = filename,
+                                      load_filename = None,
                                       perfect_model = perfect_model_system, 
                                       x_transformation_types = x_transformation_types)
 
