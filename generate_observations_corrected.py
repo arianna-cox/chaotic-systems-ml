@@ -170,18 +170,18 @@ time_step = 0.1
 # The time step used during the rk4 integration method
 integration_time_step = 0.01
 # The number of timesteps ahead the imperfect model predicts
-number_timesteps_predict = [1]
+number_timesteps_predict = [2,3,5,10]
 # The standard deviation of the random error added to the observations
-std = 0.001
+std = 0.01
 
-system = 'Moore'
-perfect_model_system = perfect_model_Moore
+system = 'Lorentz'
+perfect_model_system = perfect_model_Lorentz
 x_transformation_types = [0]
 
 number_of_data_points = int(time_span/time_step)
 print(f'number of data points kept = {number_of_data_points}')
 name = f"{system}_{number_of_data_points}"
-filename = f'data_dictionaries/data_std{std}_{name}'
+filename = f'data_dictionaries/data_{name}'
 
 dictionary = generate_series_and_predict(time_span,
                                       time_step,
@@ -189,7 +189,7 @@ dictionary = generate_series_and_predict(time_span,
                                       std,
                                       list_timesteps_predict = number_timesteps_predict,
                                       c_array = c_array,
-                                      load_filename = None,
+                                      load_filename = filename,
                                       perfect_model = perfect_model_system, 
                                       x_transformation_types = x_transformation_types)
 
