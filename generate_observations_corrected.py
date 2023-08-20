@@ -16,18 +16,17 @@ def perfect_model_Lorentz(t, x):
     return np.array([sigma * (x[1] - x[0]), x[0] * (rho - x[2]) - x[1], x[0] * x[1] - beta * x[2]])
 
 
-def perfect_model_Rossler(t, x):
+def perfect_model_Moore(t, x):
     """
-    Returns dx/dt for the Rossler attractor
+    Returns dx/dt for the Moore-Spiegel system
     :param t: time
     :param x: position
     :return: dx/dt is expressed as a numpy vector
     """
-    # Define the parameters of the Rossler attractor
-    a = 0.2
-    b = 0.2
-    c = 5.7
-    return np.array([-x[1] - x[2], x[0] + a * x[1], b + x[2] * (x[0] - c)])
+    # Define the parameters of the system
+    R = 100
+    T = 26
+    return np.array([x[1], x[2], - x[2] - (T - R + R * (x[0]**2))*x[1] - T * x[0]])
 
 
 def generate_observation_and_discard(initial_x, initial_t, final_t, step, integration_step, std, discard = 10000, perfect_model = perfect_model_Lorentz):
@@ -101,7 +100,10 @@ def generate_series_and_predict(time_span, time_step, integration_time_step, std
     # Generate observations and predict the last timestep for various values of c
     # Scale the data between -1 and 1
     # The scale factor of the data
-    maximum_allowed = 100
+    if perfect_model == perfect_model_Lorentz:
+        maximum_allowed = 100
+    elif perfect_model == perfect_model_Moore:
+        maximum_allowed = 300
     
     if load_filename is None:    
         # Create a dictionary that will contain all the data
@@ -160,25 +162,26 @@ def generate_series_and_predict(time_span, time_step, integration_time_step, std
 # Time span of each time series
 time_span = 1000
 # The value of c used in the imperfect model
-c_array_0 = [30,40,50,60,70,80,90,100,110,120,130,140,150,175,200,225,250,275,300,400,500,600,700,800,900,1000]
+# c_array_0 = [30,40,50,60,70,80,90,100,110,120,130,140,150,175,200,225,250,275,300,400,500,600,700,800,900,1000]
+c_array_0 = [np.inf]
 c_array = [c_array_0]
 # The time step of the time series
 time_step = 0.1
 # The time step used during the rk4 integration method
 integration_time_step = 0.01
 # The number of timesteps ahead the imperfect model predicts
-number_timesteps_predict = [1,2,3,5,10]
+number_timesteps_predict = [1]
 # The standard deviation of the random error added to the observations
-std = 0.01
+std = 0.001
 
-system = 'Lorentz'
-perfect_model_system = perfect_model_Lorentz
+system = 'Moore'
+perfect_model_system = perfect_model_Moore
 x_transformation_types = [0]
 
 number_of_data_points = int(time_span/time_step)
 print(f'number of data points kept = {number_of_data_points}')
 name = f"{system}_{number_of_data_points}"
-filename = f'data_dictionaries/data_testing_{name}'
+filename = f'data_dictionaries/data_std{std}_{name}'
 
 dictionary = generate_series_and_predict(time_span,
                                       time_step,

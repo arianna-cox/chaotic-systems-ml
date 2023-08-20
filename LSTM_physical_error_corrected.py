@@ -7,13 +7,19 @@ from create_LSTM_functions import create_model, create_callbacks
 
 
 # Variables relating to the data you want to load
-system = 'Lorentz'
+system = 'Moore'
 number_of_data_points = 10000
 length_of_subsequence = 20
 x_transformation_type = 0
-number_timesteps_predict = 5
+number_timesteps_predict = 1
 
-c_array = [30,40,50,60,70,80,90,100,110,120,130,140,150,175,200,225,250,275,300,400,500,600,700,800,900,1000]
+# c_array = [30,40,50,60,70,80,90,100,110,120,130,140,150,175,200,225,250,275,300,400,500,600,700,800,900,1000]
+c_array = [np.inf]
+
+#######
+name = f"{system}_{number_of_data_points}"
+filename = f'data_dictionaries/data_std0001_{name}.npy'
+######
 
 # Load the epoch dictionary
 epoch_dictionary_savename = f"{system}_{number_of_data_points}_{length_of_subsequence}_{number_timesteps_predict}"
@@ -29,7 +35,7 @@ for c in c_array:
                                                           length_of_subsequence + number_timesteps_predict,
                                                           number_timesteps_predict = number_timesteps_predict,
                                                           x_transformation_type = x_transformation_type,
-                                                          c = c)
+                                                          c = c, filename = filename)
 
     # Split into training and test data
     train_X, test_X, train_answer, test_answer = split_training_data(observations,

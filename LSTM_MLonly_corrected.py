@@ -12,7 +12,12 @@ from create_LSTM_functions import create_model, create_callbacks
 system = 'Lorentz'
 number_of_data_points = 10000
 length_of_subsequence = 20
-number_timesteps_predict = 10
+number_timesteps_predict = 2
+
+#######
+# name = f"{system}_{number_of_data_points}"
+# filename = f'data_dictionaries/data_std0001_{name}.npy'
+# ######
 
 # Load the observations and rearrange into smaller sequences
 observations = load_and_subsample_series(number_of_data_points,
