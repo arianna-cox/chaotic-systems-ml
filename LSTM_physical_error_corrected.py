@@ -11,7 +11,7 @@ system = 'Lorentz'
 number_of_data_points = 10000
 length_of_subsequence = 20
 x_transformation_type = 0
-number_timesteps_predict = 1
+number_timesteps_predict = 5
 
 c_array = [30,40,50,60,70,80,90,100,110,120,130,140,150,175,200,225,250,275,300,400,500,600,700,800,900,1000]
 
