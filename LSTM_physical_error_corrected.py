@@ -71,9 +71,9 @@ for c in c_array:
     # Number of epochs needed for training
     num_epochs = len(history.history['val_loss']) - patience
     print(f'epochs = {num_epochs}')
-    if f'x_transformation_{x_transformation_type}' not in epoch_dictionary:
+    if f'x_transformation_{x_transformation_type}' not in epoch_dictionary[f'x_transformation_{x_transformation_type}']:
         epoch_dictionary[f'x_transformation_{x_transformation_type}'] = {}
-    if 'physical_error' not in epoch_dictionary:
+    if 'physical_error' not in epoch_dictionary[f'x_transformation_{x_transformation_type}']:
         epoch_dictionary[f'x_transformation_{x_transformation_type}']['physical_error'] = {}
     epoch_dictionary[f'x_transformation_{x_transformation_type}']['physical_error'][c] = num_epochs
     

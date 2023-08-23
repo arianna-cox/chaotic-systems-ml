@@ -9,11 +9,11 @@ from create_LSTM_functions import create_model, create_callbacks
 
 
 # Variables relating to the data you want to load
-system = 'Lorentz'
+system = 'Moore'
 number_of_data_points = 10000
 length_of_subsequence = 20
 x_transformation_type = 0
-number_timesteps_predict = 10
+number_timesteps_predict = 1
 
 c_array = [30,40,50,60,70,80,90,100,110,120,130,140,150,175,200,225,250,275,300,400,500,600,700,800,900,1000]
 
@@ -66,9 +66,9 @@ for c in c_array:
     # Number of epochs needed for training
     num_epochs = len(history.history['val_loss']) - patience
     print(f'epochs = {num_epochs}')
-    if f'x_transformation_{x_transformation_type}' not in epoch_dictionary:
+    if f'x_transformation_{x_transformation_type}' not in epoch_dictionary[f'x_transformation_{x_transformation_type}']:
         epoch_dictionary[f'x_transformation_{x_transformation_type}'] = {}
-    if 'physical' not in epoch_dictionary:
+    if 'physical' not in epoch_dictionary[f'x_transformation_{x_transformation_type}']:
         epoch_dictionary[f'x_transformation_{x_transformation_type}']['physical'] = {}
     epoch_dictionary[f'x_transformation_{x_transformation_type}']['physical'][c] = num_epochs
     
