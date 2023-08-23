@@ -12,7 +12,7 @@ from create_LSTM_functions import create_model, create_callbacks
 system = 'Lorentz'
 number_of_data_points = 10000
 length_of_subsequence = 20
-list_number_timesteps_predict = [1,3,5]
+list_number_timesteps_predict = [5]
 
 for number_timesteps_predict in list_number_timesteps_predict:
     print(f'number timesteps = {number_timesteps_predict}')
@@ -55,7 +55,7 @@ for number_timesteps_predict in list_number_timesteps_predict:
 
         # Create callbacks
         save_name = f"{system}_{number_of_data_points}_{length_of_subsequence}_{number_timesteps_predict}"
-        save_filepath = f'saved_models/{system}/timesteps_{number_timesteps_predict}/MLonly_{save_name}.keras'
+        save_filepath = f'saved_models/{system}/timesteps_{number_timesteps_predict}/MLonly_epochtest{i}_{save_name}.keras'
         patience = 15
         callbacks = create_callbacks(model, patience, save_filepath)
 

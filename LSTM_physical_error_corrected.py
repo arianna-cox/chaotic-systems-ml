@@ -7,23 +7,22 @@ from create_LSTM_functions import create_model, create_callbacks
 
 
 # Variables relating to the data you want to load
-system = 'Moore'
+system = 'Lorentz'
 number_of_data_points = 10000
 length_of_subsequence = 20
 x_transformation_type = 0
-number_timesteps_predict = 1
+number_timesteps_predict = 5
 
-# c_array = [30,40,50,60,70,80,90,100,110,120,130,140,150,175,200,225,250,275,300,400,500,600,700,800,900,1000]
-c_array = [np.inf]
+c_array = [60,80,100,120,140,175,200,300,500,700,1000]
 
-#######
-name = f"{system}_{number_of_data_points}"
-filename = f'data_dictionaries/data_std0001_{name}.npy'
+# #######
+# name = f"{system}_{number_of_data_points}"
+# filename = f'data_dictionaries/data_std0001_{name}.npy'
 ######
 
 # Load the epoch dictionary
 epoch_dictionary_savename = f"{system}_{number_of_data_points}_{length_of_subsequence}_{number_timesteps_predict}"
-epoch_dictionary_filename = f'saved_models/{system}/timesteps_{number_timesteps_predict}/epoch_dictionary_{epoch_dictionary_savename}.npy'
+epoch_dictionary_filename = f'saved_models/{system}/timesteps_{number_timesteps_predict}/epoch_dictionary_corrected_{epoch_dictionary_savename}.npy'
 epoch_dictionary = np.load(epoch_dictionary_filename , allow_pickle = True).item()
 
 for c in c_array:
@@ -35,7 +34,7 @@ for c in c_array:
                                                           length_of_subsequence + number_timesteps_predict,
                                                           number_timesteps_predict = number_timesteps_predict,
                                                           x_transformation_type = x_transformation_type,
-                                                          c = c, filename = filename)
+                                                          c = c, filename = None)
 
     # Split into training and test data
     train_X, test_X, train_answer, test_answer = split_training_data(observations,
@@ -59,8 +58,8 @@ for c in c_array:
 
 
     # Create callbacks
-    save_name = f"{system}{x_transformation_type}_c{str(c).replace('.', '')}_{number_of_data_points}_{length_of_subsequence}_{number_timesteps_predict}"
-    save_filepath = f'saved_models/{system}/timesteps_{number_timesteps_predict}/x_transformation_{x_transformation_type}/physical_error_{save_name}.keras'
+    save_name = f"{system}{x_transformation_type}_c{str(c).replace('.','')}_{number_of_data_points}_{length_of_subsequence}_{number_timesteps_predict}"
+    save_filepath = f'saved_models/{system}/timesteps_{number_timesteps_predict}/x_transformation_{x_transformation_type}/physical_error_epochtest_{save_name}.keras'
     # model = keras.models.load_model(save_filepath)
     patience = 15
     callbacks = create_callbacks(model, patience, save_filepath)
@@ -71,9 +70,11 @@ for c in c_array:
     # Number of epochs needed for training
     num_epochs = len(history.history['val_loss']) - patience
     print(f'epochs = {num_epochs}')
-    if f'x_transformation_{x_transformation_type}' not in epoch_dictionary[f'x_transformation_{x_transformation_type}']:
+    if f'x_transformation_{x_transformation_type}' not in epoch_dictionary:
+        print('create dictionary x_transformation_type')
         epoch_dictionary[f'x_transformation_{x_transformation_type}'] = {}
     if 'physical_error' not in epoch_dictionary[f'x_transformation_{x_transformation_type}']:
+        print('create dictionary x_transformation_type physical error')
         epoch_dictionary[f'x_transformation_{x_transformation_type}']['physical_error'] = {}
     epoch_dictionary[f'x_transformation_{x_transformation_type}']['physical_error'][c] = num_epochs
     
