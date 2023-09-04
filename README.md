@@ -1,1 +1,1 @@
-# chaotic-systems-ml
+# This is the code for Arianna Cox's MSc Dissertation 2023 for the completion of the MSc in Mathematical Sciences in Durham

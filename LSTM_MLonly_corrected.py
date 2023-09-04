@@ -12,7 +12,12 @@ from create_LSTM_functions import create_model, create_callbacks
 system = 'Lorentz'
 number_of_data_points = 10000
 length_of_subsequence = 20
-list_number_timesteps_predict = [5]
+list_number_timesteps_predict = [2, 10]
+
+######
+name = f"{system}_{number_of_data_points}"
+load_filename = f'data_dictionaries/data_testing_{name}.npy'
+#####
 
 for number_timesteps_predict in list_number_timesteps_predict:
     print(f'number timesteps = {number_timesteps_predict}')
@@ -24,11 +29,12 @@ for number_timesteps_predict in list_number_timesteps_predict:
 
     epoch_dictionary = {}
     epoch_dictionary['MLonly'] = []
-    
+
     # Load the observations and rearrange into smaller sequences
     observations = load_and_subsample_series(number_of_data_points,
                                             system,
-                                            length_of_subsequence + number_timesteps_predict)
+                                            length_of_subsequence + number_timesteps_predict,
+                                            filename = load_filename)
     print(observations.shape)
 
     # Split into training and test data

@@ -159,44 +159,45 @@ def generate_series_and_predict(time_span, time_step, integration_time_step, std
         
     return dictionary
 
-# Time span of each time series
-time_span = 1000
-# The value of c used in the imperfect model
-c_array_0 = [30,40,50,60,70,80,90,100,110,120,130,140,150,175,200,225,250,275,300,400,500,600,700,800,900,1000, np.inf]
-c_array_0 = [50,100]
-c_array = [c_array_0]
-# The time step of the time series
-time_step = 0.1
-# The time step used during the rk4 integration method
-integration_time_step = 0.01
-# The number of timesteps ahead the imperfect model predicts
-number_timesteps_predict = [1]
-# The standard deviation of the random error added to the observations
-std = 0
+if __name__ == "__main__":
+    # Time span of each time series
+    time_span = 1000
+    # The value of c used in the imperfect model
+    c_array_0 = [30,40,50,60,70,80,90,100,110,120,130,140,150,175,200,225,250,275,300,400,500,600,700,800,900,1000, np.inf]
+    c_array_0 = [50,100]
+    c_array = [c_array_0]
+    # The time step of the time series
+    time_step = 0.1
+    # The time step used during the rk4 integration method
+    integration_time_step = 0.01
+    # The number of timesteps ahead the imperfect model predicts
+    number_timesteps_predict = [1]
+    # The standard deviation of the random error added to the observations
+    std = 0
 
-system = 'Lorentz'
-perfect_model_system = perfect_model_Lorentz
-x_transformation_types = [0]
+    system = 'Lorentz'
+    perfect_model_system = perfect_model_Lorentz
+    x_transformation_types = [0]
 
-number_of_data_points = int(time_span/time_step)
-print(f'number of data points kept = {number_of_data_points}')
-name = f"{system}_{number_of_data_points}"
-filename = f'data_dictionaries/data_std0_{name}'
+    number_of_data_points = int(time_span/time_step)
+    print(f'number of data points kept = {number_of_data_points}')
+    name = f"{system}_{number_of_data_points}"
+    filename = f'data_dictionaries/data_std0_{name}'
 
-dictionary = generate_series_and_predict(time_span,
-                                      time_step,
-                                      integration_time_step,
-                                      std,
-                                      list_timesteps_predict = number_timesteps_predict,
-                                      c_array = c_array,
-                                      load_filename = None,
-                                      perfect_model = perfect_model_system, 
-                                      x_transformation_types = x_transformation_types)
+    dictionary = generate_series_and_predict(time_span,
+                                        time_step,
+                                        integration_time_step,
+                                        std,
+                                        list_timesteps_predict = number_timesteps_predict,
+                                        c_array = c_array,
+                                        load_filename = None,
+                                        perfect_model = perfect_model_system, 
+                                        x_transformation_types = x_transformation_types)
 
-# Save variables
-dictionary["time_span"] = time_span
-dictionary["time_step"] = time_step
-dictionary["integration_time_step"] = integration_time_step
-dictionary["std"] = std
+    # Save variables
+    dictionary["time_span"] = time_span
+    dictionary["time_step"] = time_step
+    dictionary["integration_time_step"] = integration_time_step
+    dictionary["std"] = std
 
-np.save(filename, dictionary)
+    np.save(filename, dictionary)

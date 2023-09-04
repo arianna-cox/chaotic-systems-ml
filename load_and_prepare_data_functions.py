@@ -34,13 +34,17 @@ def load_and_subsample_series(number_of_data_points, system, length_of_subsequen
     return observations_subsampled
 
 
-def split_training_data(observations, number_timesteps_predict, predictions = None, predict_error = False, random_predictions = False, frac = 0.9):
+def split_training_data(observations, number_timesteps_predict, predictions = None, predict_error = False, random_predictions = False, return_all_lead_times = False, frac = 0.9):
     num_samples = observations.shape[0]
     cut_off = int(frac*num_samples)
     train_x = observations[:cut_off,:-number_timesteps_predict, :]
     test_x = observations[cut_off:,:-number_timesteps_predict, :]
     train_answer = observations[:cut_off, -1, :]
     test_answer = observations[cut_off:, -1, :]
+
+    if return_all_lead_times == True:
+        train_answer = observations[:cut_off, -number_timesteps_predict:, :]
+        test_answer = observations[cut_off:, -number_timesteps_predict:, :]
 
     if predictions is not None:
         train_prediction = predictions[:cut_off, :]
